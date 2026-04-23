@@ -1,4 +1,4 @@
-// require('dotenv').config();
+require('dotenv').config();
 // const express = require('express');
 // const userRoute = require('./api/routes/Index');
 // const bodyParser = require('body-parser');
@@ -48,24 +48,27 @@ var mongoose = require("mongoose");
 //set port
 var port = process.env.PORT || 8080;
 //connect to our mongoDB database
-try{
+try {
   mongoose.connect(
-    "mongodb+srv://mandlikr:%40Rutuja11@cluster0.vgnobys.mongodb.net/exam_mastery",
+    process.env.DB_URL,
     { useNewUrlParser: true }
   );
+  mongoose.connection.on('connected', () => {
+    console.log('Mongoose connected to:', process.env.DB_URL);
+  });
 }
-catch(error){
-  console.log("ee:",error);
+catch (error) {
+  console.log("ee:", error);
 }
 
 
 //get app data/stuff of the body(POST request) parameters
 //parse application/json
 app.use(bodyParser.json());
-const corsOptions ={
-  origin:'http://localhost:3000',
-  credentials:true,            //access-control-allow-credentials:true
-  optionSuccessStatus:200
+const corsOptions = {
+  origin: ['http://localhost:3000', 'http://localhost:3001', 'http://192.168.1.8:3000', 'http://192.168.1.8:3001'],
+  credentials: true,            //access-control-allow-credentials:true
+  optionSuccessStatus: 200
 }
 app.use(cors(corsOptions));
 //parse application/vnd+api as json

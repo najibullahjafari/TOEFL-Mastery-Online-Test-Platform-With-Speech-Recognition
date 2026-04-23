@@ -7,6 +7,7 @@ import { Box } from "@mui/material";
 import { useEffect, useState } from "react";
 import { Route, Link, Routes, useParams } from "react-router-dom";
 import { useRoute } from "@react-navigation/native";
+import { API_BASE_URL } from "../../../config/api";
 
 export default function Exam() {
   const handle = useFullScreenHandle();
@@ -19,7 +20,7 @@ export default function Exam() {
   async function getTestsByExam() {
     try {
       const response1 = await fetch(
-        `http://localhost:8080/exam-mastery/exams/${params.id}/tests`,
+        `${API_BASE_URL}/exam-mastery/exams/${params.id}/tests`,
         {
           method: "GET",
           headers: {
@@ -27,10 +28,14 @@ export default function Exam() {
             "Access-Control-Allow-Origin": "*",
             "Access-Control-Allow-Credentials": "*",
           },
-        }
+        },
       );
       const tests = await response1.json();
       console.log("tests", tests);
+      console.log(
+        "Test categories:",
+        tests.map((t) => t.category),
+      );
       return tests;
     } catch (error) {
       console.error(error);
@@ -47,23 +52,23 @@ export default function Exam() {
           let flattenExam = [];
           flattenExam.push(
             res
-              .filter((item) => item.category === "Listening")
-              .sort((a, b) => a.section - b.section)
+              .filter((item) => item.category === "listening")
+              .sort((a, b) => a.section - b.section),
           );
           flattenExam.push(
             res
-              .filter((item) => item.category === "Reading")
-              .sort((a, b) => a.section - b.section)
+              .filter((item) => item.category === "reading")
+              .sort((a, b) => a.section - b.section),
           );
           flattenExam.push(
             res
-              .filter((item) => item.category === "Writing")
-              .sort((a, b) => a.section - b.section)
+              .filter((item) => item.category === "writing")
+              .sort((a, b) => a.section - b.section),
           );
           flattenExam.push(
             res
-              .filter((item) => item.category === "Speaking")
-              .sort((a, b) => a.section - b.section)
+              .filter((item) => item.category === "speaking")
+              .sort((a, b) => a.section - b.section),
           );
           console.log(flattenExam.flat());
           setExams(flattenExam.flat());

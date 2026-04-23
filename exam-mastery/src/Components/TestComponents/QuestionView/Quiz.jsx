@@ -10,6 +10,7 @@ import Alert from "@mui/material/Alert";
 import axios from "axios";
 import styles from "../../../styles/quizstyles/QuestionView.module.scss";
 import paragraphStyles from "../../../styles/quizstyles/Paragraph.module.scss";
+import { API_BASE_URL } from "../../../config/api";
 
 let quiz_instructions = "";
 let parsedQuestionSource = "";
@@ -55,6 +56,7 @@ export const Editors = ({ questionNo, setWritingState }) => {
 };
 class Quiz extends Component {
   componentWillReceiveProps(nextProps) {
+    console.log("Quiz componentWillReceiveProps", nextProps.test);
     let test = nextProps.test;
     if (Object.keys(test).length === 0) {
       test = {
@@ -65,10 +67,13 @@ class Quiz extends Component {
       };
     }
     const questionsfromdb = test;
+    console.log("questionsfromdb", questionsfromdb);
     quiz_instructions = questionsfromdb.instruction;
     let questions = questionsfromdb.questions;
+    console.log("questions array", questions);
     parsedQuestionSource = questionsfromdb.source;
     questionCategory = questionsfromdb.category;
+    console.log("questionCategory", questionCategory);
 
     if (questionCategory === "Listening") {
       parsedQuestionSource = `
@@ -92,6 +97,7 @@ Your browser does not support the audio element.
       })),
       correctAnswer: question.answer,
     }));
+    console.log("mapped questions", questions);
     this.setState({ questionsfromdb: questions });
   }
   constructor(props) {
@@ -165,7 +171,7 @@ Your browser does not support the audio element.
       //POST request to post test results in TestHhistory of the student for all sections
       axios
         .post(
-          `http://localhost:8080/exam-mastery/students/${this.props.user}/testHistory`,
+          `${API_BASE_URL}/exam-mastery/students/${this.props.user}/testHistory`,
           {
             testType: this.props.test.category,
             testId: this.props.test._id,
@@ -173,7 +179,7 @@ Your browser does not support the audio element.
             examId: this.props.test.examId,
             score: 0,
             userResponse: this.state.questionsfromdb,
-          }
+          },
         )
         .then(() => {
           this.props.getNextTest();
@@ -184,14 +190,14 @@ Your browser does not support the audio element.
     ) {
       axios
         .post(
-          `http://localhost:8080/exam-mastery/students/${this.props.user}/testHistory`,
+          `${API_BASE_URL}/exam-mastery/students/${this.props.user}/testHistory`,
           {
             testType: this.props.test.category,
             testId: this.props.test._id,
             section: this.props.test.section,
             examId: this.props.test.examId,
             score: this.state.writingScores,
-          }
+          },
         )
         .then(() => {
           this.props.getNextTest();
@@ -260,6 +266,12 @@ Your browser does not support the audio element.
   };
 
   render() {
+    console.log(
+      "Quiz render, activeStep:",
+      this.state.activeStep,
+      "questionsfromdb length:",
+      this.state.questionsfromdb.length,
+    );
     return (
       <div>
         {this.state.booleanonsubmit ? (
@@ -286,8 +298,18 @@ Your browser does not support the audio element.
         ) : (
           <div>
             {this.state.questionsfromdb.map((item, index) => {
-              if (Math.abs(this.state.activeStep - index) <= 0) {
-                if (questionCategory === "Writing")
+              const shouldRender = this.state.activeStep === index;
+              console.log(
+                `Question ${index}: shouldRender=${shouldRender}, activeStep=${this.state.activeStep}, questionCategory=${questionCategory}`,
+              );
+              if (shouldRender) {
+                console.log(
+                  `Rendering question ${index} with category ${questionCategory}`,
+                );
+                console.log(`parsedQuestionSource:`, parsedQuestionSource);
+                console.log(`quiz_instructions:`, quiz_instructions);
+                console.log(`questionTitle:`, item.questionTitle);
+                if (questionCategory === "writing")
                   return (
                     <div className={styles.question_view_main_grid_2_columns}>
                       <section className={styles.question_view_card}>
@@ -297,9 +319,6 @@ Your browser does not support the audio element.
                             __html: parsedQuestionSource,
                           }}
                         />
-                        <div className={styles.Quiz_que}>
-                          {item.questionTitle}
-                        </div>
                       </section>
                       <section className={styles.question_view_card}>
                         <div className={styles.Quiz_container_display}>
@@ -312,7 +331,7 @@ Your browser does not support the audio element.
                       </section>
                     </div>
                   );
-                else if (questionCategory === "Speaking")
+                else if (questionCategory === "speaking")
                   return (
                     <div className={styles.question_view_main_grid_2_columns}>
                       <section className={styles.question_view_card}>
@@ -339,8 +358,8 @@ Your browser does not support the audio element.
                     </div>
                   );
                 else if (
-                  questionCategory === "Reading" ||
-                  questionCategory === "Listening"
+                  questionCategory === "reading" ||
+                  questionCategory === "listening"
                 )
                   return (
                     <div className={styles.question_view_main_grid_2_columns}>
@@ -384,7 +403,7 @@ Your browser does not support the audio element.
                                   &nbsp;&nbsp;{correctAnswer.que_options}
                                 </div>
                               );
-                            }
+                            },
                           )}
                         </div>
                       </section>

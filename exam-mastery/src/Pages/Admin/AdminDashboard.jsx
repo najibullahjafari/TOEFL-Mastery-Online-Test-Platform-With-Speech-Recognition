@@ -52,7 +52,7 @@ const AdminDashboard = () => {
     const handleClick = () => {
       const createdAtDate = new Date();
       const updatedAtDate = new Date();
-      const id = parseInt(rows[rows.length - 1].id) + 1;
+      const id = rows.length > 0 ? parseInt(rows[rows.length - 1].id) + 1 : 1;
       setRows((oldRows) => [
         ...oldRows,
         {
@@ -181,6 +181,11 @@ const AdminDashboard = () => {
       setRows(rows.map((row) => (row.id === newRow.id ? updatedRowEdit : row)));
       return updatedRowEdit;
     } else {
+      // Validate required fields before creating
+      if (!updatedRow.title || !updatedRow.date || !updatedRow.type) {
+        alert("Please fill in all required fields (Title, Date, Type)");
+        return newRow;
+      }
       fetch("http://localhost:8080/exam-mastery/createTest", {
         method: "POST",
         headers: {
@@ -195,10 +200,12 @@ const AdminDashboard = () => {
             alert("row added");
           } else {
             console.error("Error adding row:", response.status);
+            alert("Error adding row. Please check the console for details.");
           }
         })
         .catch((error) => {
           console.error("Error adding row:", error);
+          alert("Error adding row. Please check the console for details.");
         });
       return updatedRow;
     }

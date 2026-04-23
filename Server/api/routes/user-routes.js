@@ -56,6 +56,9 @@ router.get("/exams", examController.findExam);
 //get All Tests
 router.get("/tests", examController.findTests);
 
+//get JSON Tests for practice tests
+router.get("/json-tests", examController.findJsonTests);
+
 router.route("/exams/:id/tests").get(examController.findTestsById);
 
 router

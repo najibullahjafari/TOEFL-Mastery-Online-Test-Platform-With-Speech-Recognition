@@ -2,6 +2,7 @@ import React from "react";
 import { Container, Grid, Typography } from "@mui/material";
 import { useState, useEffect } from "react";
 import ExamCard from "../../Components/Student/PractiseTests/ExamCard";
+import { API_BASE_URL } from "../../config/api";
 
 //Displays the Different exams a student can take
 const PracticeTestDashBoard = () => {
@@ -9,33 +10,17 @@ const PracticeTestDashBoard = () => {
 
   async function getExamGetTest() {
     try {
-      //GET request to get all exams
-      const response1 = await fetch(
-        "http://localhost:8080/exam-mastery/exams",
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Credentials": "*",
-          },
-        }
-      );
+      //GET request to get JSON tests with questions
+      const response1 = await fetch(`${API_BASE_URL}/exam-mastery/json-tests`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Credentials": "*",
+        },
+      });
       const exams = await response1.json();
-      //GET request to get all tests
-      const response2 = await fetch(
-        "http://localhost:8080/exam-mastery/tests",
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Credentials": "*",
-          },
-        }
-      );
-      const tests = await response2.json();
-      return [exams, tests];
+      return [exams, []];
     } catch (error) {
       console.error(error);
     }
@@ -45,39 +30,7 @@ const PracticeTestDashBoard = () => {
     getExamGetTest().then((data) => {
       console.log("data", data);
       const exams = data[0].sort((a, b) => new Date(b.date) - new Date(a.date));
-      const tests = data[1];
-      exams.forEach((exam) => {
-        exam["test"] = tests.filter((test) => test.examId === exam._id);
-      });
-      //tests in exam by category
-      exams.forEach((exam) => {
-        exam["reading"] = exam.test
-          .filter((test) => test.category === "Reading")
-          .map((r) => ({ section: r.section }))
-          .sort((a, b) => a.section - b.section);
-        exam["listening"] = exam.test
-          .filter((test) => test.category === "Listening")
-          .map((r) => ({ section: r.section }))
-          .sort((a, b) => a.section - b.section);
-        exam["writing"] = exam.test
-          .filter((test) => test.category === "Writing")
-          .map((r) => ({ section: r.section }))
-          .sort((a, b) => a.section - b.section);
-        exam["speaking"] = exam.test
-          .filter((test) => test.category === "Speaking")
-          .map((r) => ({ section: r.section }))
-          .sort((a, b) => a.section - b.section);
-        if (
-          !exam["reading"].length ||
-          !exam["listening"].length ||
-          !exam["writing"].length ||
-          !exam["speaking"].length
-        ) {
-          exam["completed"] = false;
-        } else {
-          exam["completed"] = true;
-        }
-      });
+      // JSON tests already have completed flag set
       setData(exams);
     });
   }, []);

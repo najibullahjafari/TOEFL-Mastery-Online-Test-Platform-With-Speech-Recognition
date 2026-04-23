@@ -1,17 +1,17 @@
-const Mongoose = require('../app.js');
+const Mongoose = require('mongoose');
 
 // created table Schema for todo 
 const AdminExamSchema = new Mongoose.Schema({
     "id": {
-        type : String,
+        type: String,
         required: true
     },
     "title": {
-        type : String,
+        type: String,
         required: true
     },
-    "date" : {
-        type : String,
+    "date": {
+        type: String,
         required: true
     },
     "type": {
@@ -19,14 +19,14 @@ const AdminExamSchema = new Mongoose.Schema({
         required: true
     },
 },
-{
-    versionKey: false
-}
+    {
+        versionKey: false
+    }
 )
 
 //AdminSchema.virtual('id', () => this._id.toHexString())
-AdminExamSchema.set('toJSON', {virtuals: true})
+AdminExamSchema.set('toJSON', { virtuals: true })
 
-const AdminExam =  Mongoose.model('Manage_Exams', AdminExamSchema);
+const AdminExam = Mongoose.model('Manage_Exams', AdminExamSchema);
 
 module.exports = AdminExam;

@@ -4,6 +4,7 @@ import { Form, FormikProvider, useFormik } from "formik";
 import * as Yup from "yup";
 import { Select, MenuItem, FormControl } from "@mui/material";
 import Session from "../../SessionManagement/Session";
+import { API_BASE_URL } from "../../config/api";
 
 import {
   Box,
@@ -38,15 +39,25 @@ const LoginForm = ({ setAuth }) => {
   const [showPassword, setShowPassword] = useState(false);
 
   const LoginSchema = Yup.object().shape({
-        email: Yup.string().email("Provide a valid email address").matches(/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$/, 'Invalid email format.')
+    email: Yup.string()
+      .email("Provide a valid email address")
+      .matches(
+        /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$/,
+        "Invalid email format.",
+      )
       .required("Email is required"),
-    password: Yup.string()   .min(8, 'Password must be at least 8 characters long.')
-    .max(50, 'Password cannot be longer than 50 characters.')
-    .matches(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-      'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.'
-    )
-    .notOneOf(['password', '12345678'], 'Password cannot be "password" or "12345678".').required("Password is required"),
+    password: Yup.string()
+      .min(8, "Password must be at least 8 characters long.")
+      .max(50, "Password cannot be longer than 50 characters.")
+      .matches(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+        "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.",
+      )
+      .notOneOf(
+        ["password", "12345678"],
+        'Password cannot be "password" or "12345678".',
+      )
+      .required("Password is required"),
   });
 
   const formik = useFormik({
@@ -64,7 +75,7 @@ const LoginForm = ({ setAuth }) => {
         role: selectedValue,
       };
 
-      fetch("http://localhost:8080/exam-mastery/login", {
+      fetch(`${API_BASE_URL}/exam-mastery/login`, {
         method: "POST",
 
         headers: {
@@ -80,7 +91,7 @@ const LoginForm = ({ setAuth }) => {
             console.log("Navigating to dashboard");
             Session.handleLogin(bodyData.email);
             localStorage.setItem("email", bodyData.email); //Setting localstorage for Saving email during login
-            
+
             var checkREsult = selectedValue.localeCompare("Student");
             if (checkREsult == 0) {
               localStorage.setItem("role", "sidebar=true");
@@ -91,7 +102,6 @@ const LoginForm = ({ setAuth }) => {
             }
           } else {
             alert("Invalid Password or Username");
-            
           }
         })
 
@@ -131,21 +141,21 @@ const LoginForm = ({ setAuth }) => {
             initial={{ opacity: 0, y: 40 }}
             animate={animate}
           >
-             <Select
-  value={selectedValue}
-  onChange={(event) => setSelectedValue(event.target.value)}
-  required
-  displayEmpty
->
-  <MenuItem value="" disabled>
-    Select an option
-  </MenuItem>
-  {options.map((option) => (
-    <MenuItem key={option.value} value={option.value}>
-      {option.label}
-    </MenuItem>
-  ))}
-</Select>
+            <Select
+              value={selectedValue}
+              onChange={(event) => setSelectedValue(event.target.value)}
+              required
+              displayEmpty
+            >
+              <MenuItem value="" disabled>
+                Select an option
+              </MenuItem>
+              {options.map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))}
+            </Select>
 
             <TextField
               fullWidth

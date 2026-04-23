@@ -1,6 +1,6 @@
 const userModel = require("../models/user-model");
 const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const StudentHistory = require("../models/studentHistory");
 
 const userService = {
@@ -37,37 +37,44 @@ const userService = {
   //function to login new user
   async login(userObj, response) {
     console.log("inside login");
+    console.log("Email received:", userObj.email);
     userModel.findOne({ email: userObj.email }, (err, data) => {
       if (err) {
+        console.log("Database error:", err);
         response.json({ Status: "Failed", msg: err });
       } else {
+        console.log("Data found:", data ? "Yes" : "No");
         // if the Login ID and Password doesn't match
         if (data) {
-            console.log("Data mil gaya hai");
+          console.log("Data mil gaya hai");
           var result = bcrypt.compareSync(userObj.password, data.password);
-            console.log("inside compareSync");
-            if (result) {
-              jwt.sign(
-                { data },
-                "secretkey",
-                { expiresIn: "1h" },
-                (err, token) => {
-                  response.json({
-                    Status: "Success",
-                    msg: "welcome " + data.email,
-                    token: token,
-                  });
-                }
-              );
-            } else {
-              response.status(401).json({
-                Status: "Failed",
-                msg: "Invalid username or password",
-              });
-            }
-          
-
-          console.log("Password is wrong")
+          console.log("inside compareSync, password match:", result);
+          if (result) {
+            jwt.sign(
+              { data },
+              "secretkey",
+              { expiresIn: "1h" },
+              (err, token) => {
+                response.json({
+                  Status: "Success",
+                  msg: "welcome " + data.email,
+                  token: token,
+                });
+              }
+            );
+          } else {
+            console.log("Password is wrong");
+            response.status(401).json({
+              Status: "Failed",
+              msg: "Invalid username or password",
+            });
+          }
+        } else {
+          console.log("User not found");
+          response.status(401).json({
+            Status: "Failed",
+            msg: "User not found",
+          });
         }
       }
     });

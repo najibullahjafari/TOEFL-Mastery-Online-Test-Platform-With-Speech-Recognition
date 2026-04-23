@@ -1,42 +1,42 @@
-const Mongoose = require('../app.js');
+const Mongoose = require('mongoose');
 // created table Schema for todo
 
 const UserSchema = new Mongoose.Schema({
-"id":{
-    type : Mongoose.Schema.Types.ObjectId,
-    required: false
+    "id": {
+        type: Mongoose.Schema.Types.ObjectId,
+        required: false
+    },
+
+    "firstName": {
+
+        type: String,
+        required: "Enter First name"
+
+    },
+
+    "lastName": {
+        type: String,
+        required: "Enter LastName"
+    },
+
+    "password": {
+        type: String,
+        required: "Enter Password"
+    },
+
+    "email": {
+        type: String,
+        default: "Enter emails"
+
+    },
+
 },
 
- "firstName": {
+    {
 
- type : String,
- required: "Enter First name"
+        versionKey: false
 
- },
-
- "lastName": {
- type : String,
- required: "Enter LastName"
- },
-
- "password" : {
- type : String,
- required: "Enter Password"
- },
-
- "email": {
-type: String,
- default: "Enter emails"
-
- },
-
-},
-
-{
-
- versionKey: false
-
-}
+    }
 
 )
 
@@ -45,6 +45,6 @@ type: String,
 
 //UserSchema.virtual('id', () => this._id.toHexString())
 
-UserSchema.set('toJSON', {virtuals: true})
+UserSchema.set('toJSON', { virtuals: true })
 const User = Mongoose.model('Users', UserSchema);
 module.exports = User;
